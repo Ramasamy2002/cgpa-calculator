@@ -1,70 +1,93 @@
-from django.shortcuts import render
-from django.http import HttpResponse
-from django.http import HttpResponseRedirect
-
-from django.shortcuts import render,HttpResponse,redirect
+from django.shortcuts import render, redirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
-from .models import Marks,Marks1
+from .models import Marks, Marks1
+
 def sample(request):
-    credit=0
-    product=0
-    gpa=0
-    all=Marks.objects.all().values()
-    for i in all:
-        product+=i['credit']*i['score']
-        credit+=i['credit']
-        gpa=round(product/credit,4)
-    template=loader.get_template('intro.html')
-    context={
-        'all':all,
-        'gpa':gpa,
-       
+    session_id = request.session.session_key
+    if not session_id:
+        request.session.save()  # Save session explicitly to generate a session key
+        session_id = request.session.session_key
+        print("Generated session ID:", session_id)
+    else:
+        print("Existing session ID:", session_id)
+
+    credit = 0
+    product = 0
+    gpa = 0
+    all_marks = Marks.objects.filter(session_id=session_id).values()
+    print(all_marks)
+    for i in all_marks:
+        product += i['credit'] * i['score']
+        credit += i['credit']
+        gpa = round(product / credit, 4)
+
+    template = loader.get_template('intro.html')
+    context = {
+        'all': all_marks,
+        'gpa': gpa,
     }
-    return HttpResponse(template.render(context,request))
-def homeRe(request):
-    return redirect('/calc')
+    return HttpResponse(template.render(context, request))
+
 def fetch(request):
-    creditt=request.POST['credit']
-    scoree=request.POST['score']
-    s1=Marks(credit=creditt,score=scoree)
+    session_id = request.session.session_key
+    if not session_id:
+        request.session.save()
+        session_id = request.session.session_key
+        print("Generated session ID:", session_id)
+    else:
+        print("Existing session ID:", session_id)
 
-    s1.save()
+    creditt = request.POST['credit']
+    scoree = request.POST['score']
+    t = Marks(session_id=session_id, credit=creditt, score=scoree)
+    t.save()
+
     return HttpResponseRedirect(reverse('sample'))
-def delete(request,id):
-    new=Marks.objects.get(id=id)
-    new.delete()
+
+def delete(request, id):
+    session_id = request.session.session_key
+    Marks.objects.filter(id=id, session_id=session_id).delete()
     return HttpResponseRedirect(reverse('sample'))
+
 def sample2(request):
-    all1=Marks1.objects.all().values()
-    
-    summ=0
-    c=0
-    cgpa=0
-    for i in all1:
-        summ+=i['gpa']
-        c+=1
+    session_id = request.session.session_key
+    all_marks1 = Marks1.objects.filter(session_id=session_id).values()
+
+    summ = 0
+    c = 0
+    cgpa = 0
+    for i in all_marks1:
+        summ += i['gpa']
+        c += 1
+
     if summ:
-        cgpa=round(summ/c,4)
-    template=loader.get_template('cgpa.html')
-    context={
-        'all1':all1,
-        'cgpa':cgpa,
+        cgpa = round(summ / c, 4)
+
+    template = loader.get_template('cgpa.html')
+    context = {
+        'all1': all_marks1,
+        'cgpa': cgpa,
     }
-    return HttpResponse(template.render(context,request))
+    return HttpResponse(template.render(context, request))
+
 def fetchh(request):
-    gscore=request.POST['gpa']
-    t1=Marks1(gpa=gscore)
-    t1.save()
+    session_id = request.session.session_key
+    gscore = request.POST['gpa']
+    Marks1.objects.create(session_id=session_id, gpa=gscore)
     return HttpResponseRedirect(reverse('sample2'))
-def deletee(request,id):
-    new=Marks1.objects.get(id=id)
-    new.delete()
+
+def deletee(request, id):
+    session_id = request.session.session_key
+    Marks1.objects.filter(id=id, session_id=session_id).delete()
     return HttpResponseRedirect(reverse('sample2'))
+
 def revert(request):
-    template=loader.get_template('intro.html')
+    template = loader.get_template('intro.html')
     return HttpResponseRedirect(reverse('sample'))
 
-
-
-
+def homeRe(request):
+    if not request.session.session_key:
+        request.session.save()
+    return redirect('/calc')
