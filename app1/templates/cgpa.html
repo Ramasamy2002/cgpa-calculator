@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CGPA Calculator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f0f0; /* Light gray background */
+            color: #333; /* Dark font color */
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff; /* White background */
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #ff5722; /* Orange color for heading */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Text shadow for depth */
+        }
+        form {
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #009688; /* Teal color for labels */
+        }
+        input[type="integer"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+        input[type="submit"] {
+            background-color: #009688; /* Teal color for button background */
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Button shadow for depth */
+        }
+        input[type="submit"]:hover {
+            background-color: #00796b; /* Darker teal on hover */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #ff5722; /* Orange color for table headers */
+            color: #fff;
+        }
+        a {
+            color: #009688; /* Teal color for links */
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .cgpa {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 30px;
+            color: #009688; /* Teal color for CGPA text */
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #009688; /* Teal color for footer text */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>CGPA CALCULATOR</h1>
+
+        <form action="fetchh/" method="POST">
+            {% csrf_token %}
+            <label for="gpa">CGPA:</label>
+            <input type="integer" name="gpa">
+            <input type="submit" value="Calculate CGPA">
+        </form>
+
+        <table border="1">
+            <tr>
+                <th>CGPA</th>
+                <th>Action</th>
+            </tr>
+            {% for x in all1 %}
+            <tr>
+                <td>{{x.gpa}}</td>
+                <td><a href="deletee/{{x.id}}">Delete</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <div class="cgpa">CGPA: {{cgpa}}</div>
+
+        <div class="footer">
+            <a href="revert/">Calculate GPA</a>
+        </div>
+    </div>
+
+</body>
+</html>
